@@ -14,11 +14,11 @@ jobs:
     name: Unit Testing
     runs-on: ubuntu-latest
     steps:
-      - name: Cache NPM dependencies
+      - name: Cache 
         uses: actions/cache@v4.1.2
         with:
-          key: '${{ runner.os }}-node-${{ hashFiles("package-lock.json") }}'
           path: ~/.npm
+          key: '${{ runner.os }}-node-${{ hashFiles("package-lock.json") }}'
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Setup NodeJS Version
