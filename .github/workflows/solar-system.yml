@@ -14,6 +14,11 @@ jobs:
     name: Unit Testing
     runs-on: ubuntu-latest
     steps:
+      - name: Cache NPM dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: '${{ runner.os }}-node-modules-${{ hashFiles("package-lock.json") }}'
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Setup NodeJS Version
@@ -32,17 +37,17 @@ jobs:
           path: test-results.xml
 
   code-coverage:
-     runs-on: ubuntu-latest
-     steps:
-     - uses: actions/checkout@v4
-     - uses: actions/setup-node@v4
-       with:
-        node-version: 18
-     - run: npm install
-     - continue-on-error: true
-       run: npm run coverage
-     - uses: actions/upload-artifact@v4
-       with:
-        name: Code-Coverage-Result
-        path: coverage
-        retention-days: 5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: npm install
+      - continue-on-error: true
+        run: npm run coverage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Code-Coverage-Result
+          path: coverage
+          retention-days: 5
