@@ -17,8 +17,8 @@ jobs:
       - name: Cache NPM dependencies
         uses: actions/cache@v4
         with:
-          path: ~/.npm
           key: '${{ runner.os }}-node-modules-${{ hashFiles("package-lock.json") }}'
+          path: ~/.npm
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Setup NodeJS Version
