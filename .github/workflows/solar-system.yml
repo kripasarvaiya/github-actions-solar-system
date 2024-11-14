@@ -1,33 +1,66 @@
 name: Solar System Workflow
-
-on: 
-  workflow_dispatch:
+on:
+  workflow_dispatch: null
   push:
     branches:
       - main
-      - 'feature/*'
-    
+      - feature/*
+env:
+  MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
+  MONGO_USERNAME: superuser
+  MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
 jobs:
-    unit-testing:
-        name: Unit Testing
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
+  unit-testing:
+    name: Unit Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache NPM dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: '${{ runner.os }}-node-modules-${{ hashFiles("package-lock.json") }}'
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-        - name: Setup NodeJS Version
-          uses: actions/setup-node@v4
-          with:
-            node-version: 20
-    
-        - name: Install Dependencies
-          run: npm install
-    
-        - name: Unit Testing
-          run: npm test
-          
-        - name: Archive Test Result
-          uses: actions/upload-artifact@v4
-          with:
-            name: Mocha-Test-Result
-            path: test-results.xml
+      - name: Setup NodeJS Version
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Unit Testing
+        run: npm test
+
+      - name: Archive Test Result
+        if: always()  # Ensure this runs even if previous steps fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mocha-Test-Result
+          path: test-results.xml
+
+  code-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup NodeJS Version
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Coverage
+        run: npm run coverage
+        continue-on-error: true
+
+      - name: Upload Coverage Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: Code-Coverage-Result
+          path: coverage
+          retention-days: 5
